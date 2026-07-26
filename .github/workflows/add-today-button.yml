@@ -1,0 +1,32 @@
+name: Add today button
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/add-today-button.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link today button assets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'today-button.css' not in s:
+              s=s.replace('</head>','<link rel="stylesheet" href="today-button.css?v=1"></head>')
+          if 'today-button.js' not in s:
+              s=s.replace('</body>','<script src="today-button.js?v=1"></script></body>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add today navigation button"
+          git push
