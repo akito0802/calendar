@@ -13,6 +13,9 @@
 
 ## GitHub Pagesで公開
 
-Settings → Pages → Deploy from a branch → `main` → `/ (root)` → Save
+1. GitHubで新しいリポジトリを作る
+2. `index.html` をアップロード
+3. Settings → Pages
+4. Branchを `main`、フォルダを `/ (root)` にしてSave
 
 データは利用中のブラウザ内に保存されます。別端末とは同期されません。
