@@ -1,0 +1,40 @@
+name: Fix reminder notifications
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/add-reminders-v2.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch current calendar
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html'); s=p.read_text(encoding='utf-8')
+          if 'id="reminder"' not in s:
+            s=s.replace('<meta name="theme-color" content="#596af6">','<meta name="theme-color" content="#596af6"><link rel="manifest" href="manifest.webmanifest">')
+            s=s.replace('.notify-btn.on{background:var(--primary);color:#fff;border-color:transparent}', '.notify-btn.on{background:var(--p);color:#fff;border-color:transparent}')
+            s=s.replace('<div class="themes">','<button class="notify-btn" id="notify">🔔 通知を許可</button><div class="themes">',1)
+            s=s.replace('<div class="field"><label>カテゴリー</label><select id="cat">','<div class="field"><label>リマインド</label><select id="reminder"><option value="none">通知なし</option><option value="0">開始時刻</option><option value="10">10分前</option><option value="30">30分前</option><option value="60">1時間前</option><option value="1440">前日</option></select></div><div class="field"><label>カテゴリー</label><select id="cat">',1)
+            s=s.replace("q('time').value=e?.time||'';q('cat').value", "q('time').value=e?.time||'';q('reminder').value=e?.reminder??'none';q('cat').value",1)
+            s=s.replace("time:q('time').value,cat:q('cat').value", "time:q('time').value,reminder:q('reminder').value,cat:q('cat').value",1)
+            marker="function theme(t){"
+            code=r'''const nb=q('notify');function nstate(){if(!('Notification'in window)){nb.textContent='通知非対応';nb.disabled=true;return}if(Notification.permission==='granted'){nb.textContent='🔔 通知ON';nb.classList.add('on')}else if(Notification.permission==='denied'){nb.textContent='設定で通知を許可'}else nb.textContent='🔔 通知を許可'}async function nshow(title,body){try{if('serviceWorker'in navigator){let r=await navigator.serviceWorker.ready;await r.showNotification(title,{body,icon:'icon.svg',badge:'icon.svg',tag:title+body})}else new Notification(title,{body})}catch(e){console.error(e)}}nb.onclick=async()=>{if(!('Notification'in window))return;let x=await Notification.requestPermission();nstate();if(x==='granted')nshow('通知をオンにしたよ','予定の時間が近づいたらお知らせするね')};function rtime(e){if(!e.time||!e.reminder||e.reminder==='none')return null;let[y,m,d]=e.date.split('-').map(Number),[h,n]=e.time.split(':').map(Number),x=new Date(y,m-1,d,h,n);x.setMinutes(x.getMinutes()-Number(e.reminder));return x}function rcheck(){if(!('Notification'in window)||Notification.permission!=='granted')return;let now=Date.now(),sent=JSON.parse(localStorage.getItem('calendar-sent-reminders-v1')||'{}'),changed=false;E.forEach(e=>{let x=rtime(e);if(!x)return;let k=e.id+':'+e.date+':'+e.time+':'+e.reminder,d=now-x.getTime();if(d>=0&&d<90000&&!sent[k]){let lead=e.reminder==='0'?'開始時刻だよ':e.reminder==='1440'?'明日の予定だよ':e.reminder+'分前だよ';nshow(e.title,lead+(e.memo?'・'+e.memo:''));sent[k]=now;changed=true}});if(changed)localStorage.setItem('calendar-sent-reminders-v1',JSON.stringify(sent))}if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(console.error);nstate();rcheck();setInterval(rcheck,20000);'''
+            s=s.replace(marker,code+marker,1)
+            p.write_text(s,encoding='utf-8')
+          Path('manifest.webmanifest').write_text('{"name":"予定カレンダー","short_name":"カレンダー","id":"/calendar/","start_url":"/calendar/","scope":"/calendar/","display":"standalone","background_color":"#f5f7fb","theme_color":"#596af6","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}',encoding='utf-8')
+          Path('sw.js').write_text('const C="calendar-v4",A=["./","./index.html","./manifest.webmanifest","./icon.svg"];self.addEventListener("install",e=>e.waitUntil(caches.open(C).then(c=>c.addAll(A)).then(()=>self.skipWaiting())));self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));self.addEventListener("fetch",e=>{if(e.request.method==="GET")e.respondWith(fetch(e.request).then(r=>{let x=r.clone();caches.open(C).then(c=>c.put(e.request,x));return r}).catch(()=>caches.match(e.request)))});self.addEventListener("notificationclick",e=>{e.notification.close();e.waitUntil(clients.matchAll({type:"window",includeUncontrolled:true}).then(w=>w[0]?w[0].focus():clients.openWindow("./")))});',encoding='utf-8')
+          if not Path('icon.svg').exists(): Path('icon.svg').write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#596af6"/><rect x="74" y="112" width="364" height="326" rx="50" fill="white"/><rect x="74" y="112" width="364" height="90" rx="50" fill="#cfd4ff"/><path d="M150 76v74M362 76v74" stroke="white" stroke-width="30" stroke-linecap="round"/><g fill="#596af6"><circle cx="154" cy="267" r="25"/><circle cx="256" cy="267" r="25"/><circle cx="358" cy="267" r="25"/><circle cx="154" cy="358" r="25"/><circle cx="256" cy="358" r="25"/><circle cx="358" cy="358" r="25"/></g></svg>',encoding='utf-8')
+          PY
+      - name: Commit
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html manifest.webmanifest sw.js icon.svg
+          git diff --cached --quiet || git commit -m "Add working reminder notifications"
+          git push
