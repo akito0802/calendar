@@ -1,0 +1,38 @@
+/* Theme illustrations: static decorative motifs only */
+body[data-t=sea] .head,body[data-t=sea] .card,body[data-t=sea] .agenda,body[data-t=arabian] .head,body[data-t=arabian] .card,body[data-t=arabian] .agenda,body[data-t=space] .head,body[data-t=wood] .head{position:relative;overflow:hidden}
+
+/* SEA: shells, starfish, coral, resort wave */
+body[data-t=sea] .head::before{content:"🐚";position:absolute;left:18px;bottom:10px;font-size:48px;filter:drop-shadow(0 6px 7px rgba(0,90,110,.18));opacity:.9;transform:rotate(-12deg)}
+body[data-t=sea] .head::after{content:"⭐";position:absolute;right:22px;bottom:12px;font-size:44px;color:#f0a45c;filter:drop-shadow(0 6px 8px rgba(122,70,22,.18));transform:rotate(16deg);opacity:.88}
+body[data-t=sea] .card::before{content:"🐚";position:absolute;right:16px;top:10px;font-size:34px;opacity:.24;transform:rotate(22deg);pointer-events:none;z-index:0}
+body[data-t=sea] .card::after{content:"🪸";position:absolute;left:12px;bottom:4px;font-size:50px;opacity:.2;pointer-events:none;z-index:0}
+body[data-t=sea] .agenda::after{content:"🌊  RESORT CALENDAR  🐚";display:block;margin-top:16px;padding-top:12px;border-top:1px solid rgba(6,103,124,.18);text-align:center;font-size:11px;font-weight:900;letter-spacing:.16em;color:#2a8190}
+body[data-t=sea] .bar{position:relative;background-image:linear-gradient(180deg,rgba(255,255,255,.84),rgba(222,249,249,.76)),radial-gradient(ellipse at 50% 120%,rgba(9,157,180,.18) 0 36%,transparent 38%)}
+body[data-t=sea] .day:nth-child(5n+1)::after{content:"·";position:absolute;right:7px;bottom:3px;color:#34aac0;font-size:20px;opacity:.22}
+
+/* ARABIAN: palace, camel, crescent, lantern */
+body[data-t=arabian] .head::after{content:"☾";position:absolute;right:24px;bottom:8px;font-family:Georgia,serif;font-size:74px;color:#f2cf72;opacity:.8;text-shadow:0 0 24px rgba(242,207,114,.28);transform:rotate(-12deg)}
+body[data-t=arabian] .head h1::after{content:"  ✦";font-size:.55em;color:#e9c86f}
+body[data-t=arabian] .card::before{content:"🕌";position:absolute;right:12px;bottom:-12px;font-size:88px;opacity:.17;filter:sepia(1) saturate(.9);pointer-events:none;z-index:0}
+body[data-t=arabian] .card::after{content:"🐪";position:absolute;left:14px;bottom:2px;font-size:54px;opacity:.24;pointer-events:none;z-index:0;transform:scaleX(-1)}
+body[data-t=arabian] .agenda::before{content:"✦  DESERT NIGHTS  ✦";display:block;margin:-4px 0 14px;text-align:center;font-family:Georgia,serif;font-size:11px;letter-spacing:.28em;color:#e2c36c}
+body[data-t=arabian] .agenda::after{content:"🏮   ◇   🐪   ◇   🕌";display:block;margin-top:14px;padding-top:12px;border-top:1px solid rgba(220,183,86,.3);text-align:center;font-size:25px;letter-spacing:.25em;opacity:.72}
+body[data-t=arabian] .bar::before,body[data-t=arabian] .bar::after{content:"◆";color:#d9b85c;font-size:18px;opacity:.8}
+body[data-t=arabian] .day:nth-child(7n+1)::after{content:"✦";position:absolute;right:6px;bottom:4px;color:#d9b85c;opacity:.22}
+
+/* SPACE: planets, rocket, constellation */
+body[data-t=space] .head::after{content:"🪐";position:absolute;right:20px;bottom:5px;font-size:72px;opacity:.78;filter:drop-shadow(0 0 18px rgba(120,104,255,.45));transform:rotate(-10deg)}
+body[data-t=space] .card::before{content:"🚀";position:absolute;right:18px;top:18px;font-size:38px;opacity:.22;transform:rotate(-24deg);pointer-events:none;z-index:0}
+body[data-t=space] .card::after{content:"✦  ·  ✧  ·  ✦";position:absolute;left:20px;bottom:10px;font-size:18px;letter-spacing:.5em;color:#8bd7ff;opacity:.22;pointer-events:none}
+body[data-t=space] .agenda::after{content:"☄  DEEP SPACE SCHEDULE  🪐";display:block;margin-top:15px;padding-top:12px;border-top:1px solid rgba(122,151,255,.22);text-align:center;font-size:11px;font-weight:900;letter-spacing:.22em;color:#91cfff}
+body[data-t=space] .day:nth-child(6n)::after{content:"✦";position:absolute;right:7px;bottom:4px;color:#89d8ff;opacity:.28;text-shadow:0 0 10px #72caff}
+
+/* WOOD: quill, leaf, journal stamp */
+body[data-t=wood] .head::after{content:"🪶";position:absolute;right:20px;bottom:-2px;font-size:70px;opacity:.68;filter:sepia(.55) drop-shadow(0 7px 5px rgba(38,18,8,.28));transform:rotate(-18deg)}
+body[data-t=wood] .card::after{content:"🍂";position:absolute;right:12px;bottom:5px;font-size:46px;opacity:.24;pointer-events:none}
+body[data-t=wood] .agenda::before{content:"LEATHER JOURNAL • DAILY NOTES";display:block;margin:-2px 0 14px;padding-bottom:10px;border-bottom:2px dashed rgba(110,65,32,.28);font-family:Georgia,serif;font-size:10px;letter-spacing:.2em;text-align:center;color:#765034}
+body[data-t=wood] .theme{font-family:Georgia,"Yu Mincho",serif}
+
+/* Keep illustrations behind usable content */
+.head>* ,.card>* ,.agenda>*{position:relative;z-index:1}
+@media(max-width:720px){body[data-t=sea] .head::before{font-size:34px;left:8px;bottom:4px}body[data-t=sea] .head::after{font-size:31px;right:8px;bottom:5px}body[data-t=arabian] .head::after{font-size:52px;right:8px}body[data-t=space] .head::after{font-size:49px;right:7px}body[data-t=wood] .head::after{font-size:48px;right:6px}.head::before,.head::after{pointer-events:none}.agenda::after{font-size:10px!important;letter-spacing:.1em!important}}
