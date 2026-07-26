@@ -1,0 +1,31 @@
+name: Add theme decorations
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/add-theme-decor.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link decoration stylesheet
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          link='<link rel="stylesheet" href="theme-decor.css?v=1">'
+          if 'theme-decor.css' not in s:
+              s=s.replace('</head>',link+'</head>')
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git diff --cached --quiet || git commit -m "Link illustrated theme decorations"
+          git push
