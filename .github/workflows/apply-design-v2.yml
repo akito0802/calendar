@@ -1,0 +1,30 @@
+name: Apply design v2
+on:
+  push:
+    paths: ['.github/workflows/apply-design-v2.yml']
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attach visual stylesheet
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<link rel="stylesheet" href="design-v2.css?v=2">'
+          if tag not in s:
+              s=s.replace('</head>',tag+'</head>')
+          s=s.replace('>シンプル<','>◻︎ シンプル<').replace('>木目調<','>▤ 木目調<').replace('>宇宙<','>✦ 宇宙<').replace('>アラビアン<','>◇ アラビアン<').replace('>海<','>≈ 海<')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit design
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git commit -m "Apply polished visual themes" || exit 0
+          git push
