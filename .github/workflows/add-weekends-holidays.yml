@@ -1,0 +1,32 @@
+name: Add weekends and holidays
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/add-weekends-holidays.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link weekend and holiday assets
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'weekend-holidays.css' not in s:
+              s=s.replace('</head>','<link rel="stylesheet" href="weekend-holidays.css?v=1"></head>')
+          if 'weekend-holidays.js' not in s:
+              s=s.replace('</body>','<script src="weekend-holidays.js?v=1"></script></body>')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add index.html
+          git diff --cached --quiet || git commit -m "Enable weekend and Japanese holiday display"
+          git push
